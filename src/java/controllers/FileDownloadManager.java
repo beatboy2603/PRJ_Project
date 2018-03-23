@@ -38,7 +38,16 @@ public class FileDownloadManager extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String code = request.getParameter("f");
+        String code="";
+        String a = request.getRequestURI();
+        String[] b = a.split("/");
+        if(b.length>5){
+            for(int i=3;i<b.length-1;i++){
+                if(i!=3)code+="/";
+                code+=b[i];
+            }
+        }
+        else code = a.split("/")[3];
         Util.Base64 decrypt = new Util.Base64(code);
         String PermitIP = decrypt.getIp();
         int id = decrypt.getId();
@@ -60,7 +69,7 @@ public class FileDownloadManager extends HttpServlet {
             return;
         }
         String path = getServletContext().getInitParameter("Storage")+get.getfOwner()+"\\"+get.getfName();
-            
+        System.out.println(path);
         File file = new File(path);
         
         String fileName = file.getName();

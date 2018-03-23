@@ -12,6 +12,6 @@
         <title>Download</title>
     </head>
     <body >
-        <a href="./FileDownloadManager?f=${link}"><h1>Download ${fName}</h1></a>
+        <a href="./FileDownloadManager/${link}/${fName}"><h1>Download ${fName}</h1></a>
     </body>
 </html>

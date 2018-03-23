@@ -10,11 +10,19 @@
     </filter-mapping>
     <context-param>
         <param-name>Storage</param-name>
-        <param-value>E:\Semester 4\PRJ321 (Web-Based Java Applications)\Java Code\PRJ_Project\web\fileManager\</param-value>
+        <param-value>D:\Documents\NetBeansProjects\PRJ_Project\web\fileManager\</param-value>
     </context-param>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
+    <servlet>
+        <servlet-name>FileDownloadManager</servlet-name>
+        <servlet-class>controllers.FileDownloadManager</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileDownloadManager</servlet-name>
+        <url-pattern>/FileDownloadManager/*</url-pattern>
+    </servlet-mapping>
 </web-app>
