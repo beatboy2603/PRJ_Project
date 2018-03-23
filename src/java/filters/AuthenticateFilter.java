@@ -65,6 +65,8 @@ public class AuthenticateFilter implements Filter{
             }else{
                 ((HttpServletResponse)response).sendRedirect("./Login");
             }
+        }else if(requestPath.contains("FileDownloadManager")){
+            chain.doFilter(request, response);
         }else
         {
             HttpSession session = req.getSession();

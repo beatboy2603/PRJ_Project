@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,10 +29,15 @@ public class Base64 {
     public Base64(String ip, int id, long timestamp) {
         this.ip = ip;
         this.id = id;
-        this.timestamp = timestamp;
+        Date date = new Date(timestamp);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.MINUTE, 15);
+        this.timestamp = cal.getTimeInMillis();
     }
     
     public Base64(String code){
+        System.out.println(code);
         byte[] buffer = java.util.Base64.getDecoder().decode(code);
         reverse(buffer);
         int length = buffer.length;
@@ -58,6 +64,7 @@ public class Base64 {
         byte[] idByte = ByteBuffer.allocate(Integer.BYTES).putInt(id).array();
         reverse(idByte);
         byte[] ipByte = ip.getBytes();
+        System.out.println(ip);
         byte[] timepstampByte = ByteBuffer.allocate(Long.BYTES).putLong(timestamp).array();
         java.io.ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
@@ -87,16 +94,7 @@ public class Base64 {
     }
 
     public static void main(String[] args){
-        int id = 3;
-        java.util.Calendar timeout = java.util.Calendar.getInstance();
-        timeout.add(Calendar.MINUTE, 15);
-        long timestamp = timeout.getTimeInMillis();
-        String ip = "147.0.0.1";
-        Base64 encoder = new Base64(ip, id, timestamp);
-        String encoded = encoder.getEncoded();
-        System.out.println(encoded);
-        Base64 decoder = new Base64(encoded);
-        System.out.println(decoder.getId()+" "+decoder.getIp()+" "+(new java.util.Date(decoder.getTimestamp())));
-        
+        Base64 a =new Base64("/v/RUmIBAAAxOjA6MDowOjA6MDowOjAAAAAM");
+        System.out.println(new java.util.Date(a.getTimestamp()));
     }
 }

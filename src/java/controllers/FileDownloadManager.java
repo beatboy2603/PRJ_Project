@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
 /**
  *
  * @author Think
@@ -38,26 +37,30 @@ public class FileDownloadManager extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String code="";
+        String code = "";
         String a = request.getRequestURI();
         String[] b = a.split("/");
-        if(b.length>5){
-            for(int i=3;i<b.length-1;i++){
-                if(i!=3)code+="/";
-                code+=b[i];
+        if (b.length > 5) {
+            for (int i = 3; i < b.length - 1; i++) {
+                if (i != 3) {
+                    code += "/";
+                }
+                code += b[i];
             }
+        } else {
+            code = a.split("/")[3];
         }
-        else code = a.split("/")[3];
         Util.Base64 decrypt = new Util.Base64(code);
         String PermitIP = decrypt.getIp();
         int id = decrypt.getId();
         String ClientIP = request.getRemoteAddr();
-        if(!ClientIP.equals(PermitIP)||decrypt.getTimestamp()>( new java.util.Date()).getTime()){
-            response.sendRedirect("./File/"+id);
+        if ((!ClientIP.equals(PermitIP)) || decrypt.getTimestamp() < (new java.util.Date()).getTime()) {
+            System.out.println(ClientIP + "/" + PermitIP);
+            System.out.println(decrypt.getTimestamp());
+            System.out.println((new java.util.Date()).getTime());
             return;
         }
         HttpSession session = request.getSession();
-        String usernameInSession = (String)session.getAttribute("username");
         models.File get = null;
         try {
             dao.FileDao dao = new FileDao();
@@ -65,16 +68,16 @@ public class FileDownloadManager extends HttpServlet {
         } catch (Exception ex) {
             Logger.getLogger(FileDownloadManager.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(get==null){
+        if (get == null) {
             return;
         }
-        String path = getServletContext().getInitParameter("Storage")+get.getfOwner()+"\\"+get.getfName();
-        System.out.println(path);
+        String path = getServletContext().getInitParameter("Storage") + get.getfOwner() + "\\" + get.getfName();
         File file = new File(path);
-        
+
         String fileName = file.getName();
 
         if (!file.exists()) {
+            System.out.println(file.getAbsolutePath());
             System.out.println("Not found");
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -107,7 +110,7 @@ public class FileDownloadManager extends HttpServlet {
         if (contentType == null) {
             contentType = "application/octet-stream";
         }
-        
+
         response.reset();
         response.setHeader("Content-Disposition", "attachment;filename=\"" + fileName + "\"");
         response.setHeader("Accept-Ranges", "bytes");
@@ -122,23 +125,24 @@ public class FileDownloadManager extends HttpServlet {
             response.setContentType(contentType);
             response.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + length);
             response.setHeader("Content-Length", String.valueOf(length));
-            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+            if (start != 0 || end != length - 1) {
+                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+            }
             byte[] buffer = new byte[1024];
             int read;
             input.skip(start);
             long toRead = length;
-            System.out.println("abc");
+            System.out.println(file.getAbsolutePath());
             while (toRead > 0) {
                 read = input.read(buffer);
-                toRead-=read;
+                toRead -= read;
                 output.write(buffer);
             }
-        } catch (IOException e) 
-        {
+        } catch (IOException e) {
             /*Do nothing since it is most likely user disconnected from download*/
         } finally {
             try {
-                
+
                 input.close();
                 output.close();
             } catch (IOException e) {
