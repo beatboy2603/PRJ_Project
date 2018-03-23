@@ -12,7 +12,6 @@
         <title>Download</title>
     </head>
     <body >
-        <h1>Download ${fName}</h1>
-        <a href="./FileDownloadManager?f=${link}"><h1>${link}</h1></a>
+        <a href="./FileDownloadManager?f=${link}"><h1>Download ${fName}</h1></a>
     </body>
 </html>
