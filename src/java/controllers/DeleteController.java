@@ -35,7 +35,7 @@ public class DeleteController extends HttpServlet {
             File file = (new FileDao()).getFile(Integer.parseInt(fId));
             (new PermitDao()).deleteAllPermit(Integer.parseInt(fId));
             (new FileDao()).deleteFile(Integer.parseInt(fId));
-            Path path = Paths.get("E:\\Semester 4\\PRJ321 (Web-Based Java Applications)\\Java Code\\PRJ_Project\\web\\fileManager\\" + file.getfOwner() + "\\" + file.getfName());
+            Path path = Paths.get(getServletContext().getInitParameter("Storage") + file.getfOwner() + "\\" + file.getfName());
             Files.delete(path);
             response.sendRedirect("./File");
         } catch (Exception ex) {

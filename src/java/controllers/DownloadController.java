@@ -42,8 +42,6 @@ public class DownloadController extends HttpServlet {
                     response.sendRedirect("./File");
                 }
             }
-            //Base64 sua id thanh String
-            String fOwner = file.getfOwner();
             String IP = request.getRemoteAddr();
 
             long timestamp = java.util.Calendar.getInstance().getTimeInMillis();

@@ -51,7 +51,7 @@ public class Signup extends HttpServlet {
                 view.forward(request, response);
             } else {
                 (new UserDao()).addUser(username, pass);
-                Files.createDirectories(Paths.get("E:\\Semester 4\\PRJ321 (Web-Based Java Applications)\\Java Code\\PRJ_Project\\web\\fileManager\\" + username));
+                Files.createDirectories(Paths.get(getServletContext().getInitParameter("Storage") + username));
                 response.sendRedirect("./Login");
             }
         } catch (Exception ex) {

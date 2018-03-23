@@ -59,7 +59,7 @@ public class FileDownloadManager extends HttpServlet {
         if(get==null){
             return;
         }
-        String path = getServletContext().getInitParameter("Storage")+get.getfOwner()+"\\"+id;
+        String path = getServletContext().getInitParameter("Storage")+get.getfOwner()+"\\"+get.getfName();
             
         File file = new File(path);
         
@@ -118,6 +118,7 @@ public class FileDownloadManager extends HttpServlet {
             int read;
             input.skip(start);
             long toRead = length;
+            System.out.println("abc");
             while (toRead > 0) {
                 read = input.read(buffer);
                 toRead-=read;

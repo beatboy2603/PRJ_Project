@@ -78,7 +78,7 @@ public class FileController extends HttpServlet {
                 InputStream fileContent = filePart.getInputStream();
                 byte[] buffer = new byte[fileContent.available()];
                 fileContent.read(buffer);
-                java.io.File targetFile = new java.io.File("E:\\Semester 4\\PRJ321 (Web-Based Java Applications)\\Java Code\\PRJ_Project\\web\\fileManager\\" + username + "\\" + fileName);
+                java.io.File targetFile = new java.io.File(getServletContext().getInitParameter("Storage") + username + "\\" + fileName);
                 OutputStream outStream = new FileOutputStream(targetFile);
                 outStream.write(buffer);
                 String fName = fileName;
@@ -91,7 +91,7 @@ public class FileController extends HttpServlet {
                 fileContent.close();
                 outStream.close();
                 //sleep de kip copy file vao
-//                sleep(2000);
+                sleep(2000);
             }
             response.sendRedirect("./File");
         } catch (Exception ex) {
