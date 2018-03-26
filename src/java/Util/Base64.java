@@ -37,8 +37,7 @@ public class Base64 {
     }
     
     public Base64(String code){
-        System.out.println(code);
-        byte[] buffer = java.util.Base64.getDecoder().decode(code);
+        byte[] buffer = java.util.Base64.getDecoder().decode(code.replaceAll("_", "/"));
         reverse(buffer);
         int length = buffer.length;
         int offset=0;
@@ -64,7 +63,6 @@ public class Base64 {
         byte[] idByte = ByteBuffer.allocate(Integer.BYTES).putInt(id).array();
         reverse(idByte);
         byte[] ipByte = ip.getBytes();
-        System.out.println(ip);
         byte[] timepstampByte = ByteBuffer.allocate(Long.BYTES).putLong(timestamp).array();
         java.io.ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
@@ -76,7 +74,7 @@ public class Base64 {
         }
         byte[] k = out.toByteArray();
         reverse(k);
-        return new String(java.util.Base64.getEncoder().encode(k));
+        return (new String(java.util.Base64.getEncoder().encode(k))).replaceAll("/", "_");
     }
     
     public String getIp() {

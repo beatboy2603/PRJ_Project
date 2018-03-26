@@ -29,23 +29,6 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "FileDownloadManager", urlPatterns = {"/FileDownloadManager"})
 public class FileDownloadManager extends HttpServlet {
 
-    private byte[] ipv4toipv6(String ip) throws UnknownHostException {
-        String[] octets = ip.split("\\.");
-        byte[] octetBytes = new byte[4];
-        for (int i = 0; i < 4; ++i) {
-            octetBytes[i] = (byte) Integer.parseInt(octets[i]);
-        }
-
-        byte ipv4asIpV6addr[] = new byte[16];
-        ipv4asIpV6addr[10] = (byte) 0xff;
-        ipv4asIpV6addr[11] = (byte) 0xff;
-        ipv4asIpV6addr[12] = octetBytes[0];
-        ipv4asIpV6addr[13] = octetBytes[1];
-        ipv4asIpV6addr[14] = octetBytes[2];
-        ipv4asIpV6addr[15] = octetBytes[3];
-        return ipv4asIpV6addr;
-    }
-
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -57,19 +40,8 @@ public class FileDownloadManager extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String code = "";
         String a = request.getRequestURI();
-        String[] b = a.split("/");
-        if (b.length > 5) {
-            for (int i = 3; i < b.length - 1; i++) {
-                if (i != 3) {
-                    code += "/";
-                }
-                code += b[i];
-            }
-        } else {
-            code = a.split("/")[3];
-        }
+        String code = a.split("/")[3];
         Util.Base64 decrypt;
         try{
             decrypt = new Util.Base64(code);
@@ -77,24 +49,26 @@ public class FileDownloadManager extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+        int id = decrypt.getId();
         String permit = decrypt.getIp();
         String client = request.getRemoteAddr();
-        if("0:0:0:0:0:0:0:1".equals(permit) && "127.0.0.1".equals(client)){}else
+        
         if ((!permit.equals(client)) || decrypt.getTimestamp() < (new java.util.Date()).getTime()) {
-            System.out.println(permit+"/"+client);
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.sendRedirect("/PRJ_Project/Download?fId="+id);
             return;
         }
-        int id = decrypt.getId();
-        HttpSession session = request.getSession();
+        
         models.File get = null;
         try {
             dao.FileDao dao = new FileDao();
             get = dao.getFile(id);
         } catch (Exception ex) {
             Logger.getLogger(FileDownloadManager.class.getName()).log(Level.SEVERE, null, ex);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
         if (get == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         String path = getServletContext().getInitParameter("Storage") + get.getfOwner() + "\\" + get.getfName();
@@ -103,8 +77,6 @@ public class FileDownloadManager extends HttpServlet {
         String fileName = file.getName();
 
         if (!file.exists()) {
-            System.out.println(file.getAbsolutePath());
-            System.out.println("Not found");
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -150,15 +122,16 @@ public class FileDownloadManager extends HttpServlet {
             output = response.getOutputStream();
             response.setContentType(contentType);
             response.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + length);
-            response.setHeader("Content-Length", String.valueOf(length));
+            response.setHeader("Content-Length", String.valueOf(end-start+1));
             if (start != 0 || end != length - 1) {
                 response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+            }else{
+                response.setStatus(HttpServletResponse.SC_OK);
             }
             byte[] buffer = new byte[1024];
             int read;
             input.skip(start);
             long toRead = length;
-            System.out.println(file.getAbsolutePath());
             while (toRead > 0) {
                 read = input.read(buffer);
                 toRead -= read;
