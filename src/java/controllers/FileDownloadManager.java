@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -25,6 +28,23 @@ import javax.servlet.http.HttpSession;
  */
 @WebServlet(name = "FileDownloadManager", urlPatterns = {"/FileDownloadManager"})
 public class FileDownloadManager extends HttpServlet {
+
+    private byte[] ipv4toipv6(String ip) throws UnknownHostException {
+        String[] octets = ip.split("\\.");
+        byte[] octetBytes = new byte[4];
+        for (int i = 0; i < 4; ++i) {
+            octetBytes[i] = (byte) Integer.parseInt(octets[i]);
+        }
+
+        byte ipv4asIpV6addr[] = new byte[16];
+        ipv4asIpV6addr[10] = (byte) 0xff;
+        ipv4asIpV6addr[11] = (byte) 0xff;
+        ipv4asIpV6addr[12] = octetBytes[0];
+        ipv4asIpV6addr[13] = octetBytes[1];
+        ipv4asIpV6addr[14] = octetBytes[2];
+        ipv4asIpV6addr[15] = octetBytes[3];
+        return ipv4asIpV6addr;
+    }
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -50,16 +70,22 @@ public class FileDownloadManager extends HttpServlet {
         } else {
             code = a.split("/")[3];
         }
-        Util.Base64 decrypt = new Util.Base64(code);
-        String PermitIP = decrypt.getIp();
-        int id = decrypt.getId();
-        String ClientIP = request.getRemoteAddr();
-        if ((!ClientIP.equals(PermitIP)) || decrypt.getTimestamp() < (new java.util.Date()).getTime()) {
-            System.out.println(ClientIP + "/" + PermitIP);
-            System.out.println(decrypt.getTimestamp());
-            System.out.println((new java.util.Date()).getTime());
+        Util.Base64 decrypt;
+        try{
+            decrypt = new Util.Base64(code);
+        }catch(Exception e){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+        String permit = decrypt.getIp();
+        String client = request.getRemoteAddr();
+        if("0:0:0:0:0:0:0:1".equals(permit) && "127.0.0.1".equals(client)){}else
+        if ((!permit.equals(client)) || decrypt.getTimestamp() < (new java.util.Date()).getTime()) {
+            System.out.println(permit+"/"+client);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        int id = decrypt.getId();
         HttpSession session = request.getSession();
         models.File get = null;
         try {
