@@ -10,9 +10,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -20,7 +17,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -41,9 +37,9 @@ public class FileDownloadManager extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String a = request.getRequestURI();
-        String code = a.split("/")[3];
         Util.Base64 decrypt;
         try{
+            String code = a.split("/")[3];
             decrypt = new Util.Base64(code);
         }catch(Exception e){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

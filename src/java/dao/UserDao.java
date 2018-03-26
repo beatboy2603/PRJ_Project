@@ -56,11 +56,6 @@ public class UserDao {
             ResultSet rs = preparedStatement.executeQuery();
             if (!rs.next()) {
                 return false;
-                //sign up case sensitive
-//            }else{
-//                if (!username.equals(rs.getString("username"))) {
-//                    return false;
-//                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -92,6 +87,20 @@ public class UserDao {
                 prepareStatement("insert into Users values (?, ?)");
         preparedStatement.setString(1, username);
         preparedStatement.setString(2, pass);
+        preparedStatement.execute();
+    }
+    public void deleteUser(String username) throws SQLException{
+        PreparedStatement preparedStatement = connection.
+                prepareStatement("delete from Permit where username=?");
+        preparedStatement.setString(1, username);
+        preparedStatement.execute();
+        preparedStatement = connection.
+                prepareStatement("delete from Files where fOwner=?");
+        preparedStatement.setString(1, username);
+        preparedStatement.execute();
+        preparedStatement = connection.
+                prepareStatement("delete from User where username=?");
+        preparedStatement.setString(1, username);
         preparedStatement.execute();
     }
 }

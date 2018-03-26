@@ -40,6 +40,7 @@ public class DownloadController extends HttpServlet {
                 String username = (String) session.getAttribute("username");
                 if(!(new PermitDao()).checkPermit(Integer.parseInt(fId), username)){
                     response.sendRedirect("./File");
+                    return;
                 }
             }
             String IP = request.getRemoteAddr();
