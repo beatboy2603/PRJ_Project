@@ -103,4 +103,17 @@ public class UserDao {
         preparedStatement.setString(1, username);
         preparedStatement.execute();
     }
+    public List<User> getAllUsers() throws SQLException{
+        PreparedStatement ps = connection.prepareStatement("select * from Users");
+        ResultSet rs = ps.executeQuery();
+        List<User> users = new ArrayList<>();
+        while(rs.next()){
+            User user = new User();
+            user.setUsername(rs.getString(1));
+            user.setPassword(rs.getString(2));
+            user.setQuota(rs.getInt(3));
+            users.add(user);
+        }
+        return users;
+    }
 }

@@ -12,6 +12,18 @@
         <param-name>Storage</param-name>
         <param-value>D:\Documents\NetBeansProjects\PRJ_Project\web\fileManager\</param-value>
     </context-param>
+    <context-param>
+        <param-name>admin</param-name>
+        <param-value>6dm1n</param-value>
+    </context-param>
+    <context-param>
+        <param-name>pass</param-name>
+        <param-value>1234</param-value>
+    </context-param>
+    <servlet-mapping>
+        <servlet-name>UserController</servlet-name>
+        <url-pattern>/User</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30
@@ -20,6 +32,10 @@
     <servlet>
         <servlet-name>FileDownloadManager</servlet-name>
         <servlet-class>controllers.FileDownloadManager</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserController</servlet-name>
+        <servlet-class>controllers.UserController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>FileDownloadManager</servlet-name>

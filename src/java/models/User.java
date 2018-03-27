@@ -5,6 +5,8 @@
  */
 package models;
 
+import java.math.BigInteger;
+
 /**
  *
  * @author ADMIN
@@ -12,6 +14,19 @@ package models;
 public class User {
     private String username;
     private String pass;
+    private int quota;
+
+    public int getQuota() {
+        return quota;
+    }
+
+    public void setQuota(int quota) {
+        this.quota = quota;
+    }
+
+    
+
+    
 
     public String getUsername() {
         return username;

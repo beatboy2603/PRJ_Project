@@ -53,7 +53,11 @@ public class AuthenticateFilter implements Filter{
             HttpSession session = req.getSession();
             if(session.getAttribute("username")!=null)
             {
-                ((HttpServletResponse)response).sendRedirect("./File");
+                if(session.getAttribute("admin")!=null)
+                {
+                    ((HttpServletResponse)response).sendRedirect("./User");
+                }
+                else ((HttpServletResponse)response).sendRedirect("./File");
             }
             else
             {
@@ -67,7 +71,16 @@ public class AuthenticateFilter implements Filter{
             }
         }else if(requestPath.contains("FileDownloadManager")){
             chain.doFilter(request, response);
-        }else
+        }else if(requestPath.endsWith("User")){
+            HttpSession session = req.getSession();
+            if(session.getAttribute("admin")!=null)
+            {
+                chain.doFilter(request, response);
+            }else{
+                ((HttpServletResponse)response).sendRedirect("./Login");
+            }
+        }
+        else
         {
             HttpSession session = req.getSession();
             if(session.getAttribute("username")!=null)

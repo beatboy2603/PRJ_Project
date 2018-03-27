@@ -39,10 +39,12 @@ public class FileController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         try {
             HttpSession session = request.getSession();
             String usernameInSession = (String) session.getAttribute("username");
+            if(usernameInSession.equals(getServletContext().getInitParameter("admin"))){
+                usernameInSession=request.getParameter("username");
+            }
             FileDao dao = new FileDao();
             List<File> files;
             String fileType = request.getParameter("fileType") == null ? "myFiles" : request.getParameter("fileType").trim().equals("myFiles") ? "myFiles" : "sharedFiles";

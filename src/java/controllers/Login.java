@@ -7,10 +7,10 @@ package controllers;
 
 import dao.UserDao;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +24,8 @@ import javax.servlet.http.HttpSession;
  */
 @WebServlet(name = "Login", urlPatterns = {"/Login"})
 public class Login extends HttpServlet {
+
+    
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -53,7 +55,12 @@ public class Login extends HttpServlet {
                     RequestDispatcher view = request.getRequestDispatcher("/WEB-INF/login.jsp");
                     view.forward(request, response);
                 }
-                if ((new UserDao()).checkUser(username, pass)) {
+                if(Util.Administrator.loginAdmin(username, pass, getServletContext()))
+                {
+                    session.setAttribute("username", username);
+                    session.setAttribute("admin", username);
+                    response.sendRedirect("./User");
+                }else if ((new UserDao()).checkUser(username, pass)) {
                     session.setAttribute("username", username);
                     response.sendRedirect("./File");
                 } else {
