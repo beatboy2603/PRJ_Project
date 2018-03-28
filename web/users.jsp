@@ -69,20 +69,15 @@
             <thead>
                 <tr>
                     <th>Username</th>
-                    <th>Quota</th>
+                    <th>Quota(MB)</th>
                 </tr>
             </thead>
             <tbody>
                 <c:forEach items="${users}" var="one">
                     <tr>
                         <td><a href="./File?username=${one.username}">${one.username}</a></td>
-                        <td>${one.quota}</td>
-                        <td>
-                            <form action="./User" method="POST">
-                                <input type="hidden" name="username" value="${one.username}"/>
-                                <input type="submit" value="Delete"/>
-                            </form>
-                        </td>
+                        <td><fmt:formatNumber type = "number" 
+                                          maxFractionDigits = "3" value = "${one.quota/1024/1024}"/> MB</td>
                     </tr>
                 </c:forEach>
             </tbody>
