@@ -63,14 +63,35 @@ public class UserDao {
         return true;
     }
 
-    public List<String> getShareableUsers(int fId) {
+    public User getUser(String username) {
+        User user = new User();
+        try {
+            PreparedStatement preparedStatement = connection.
+                    prepareStatement("select * from [users] "
+                            + "where username = ?");
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                user.setUsername(rs.getString(1));
+                user.setPassword(rs.getString(2));
+                user.setQuota(rs.getInt(3));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
+    public List<String> getShareableUsers(int fId, String filterName) {
         List<String> usernames = new ArrayList<String>();
         try {
             PreparedStatement preparedStatement = connection.
-                    prepareStatement("select username from users \n"
+                    prepareStatement("select username from users where username in"
+                            + "(select username from users \n"
                             + "except \n"
-                            + "select username from permit where Id = ? ");
+                            + "select username from permit where Id = ?) and username like ? ");
             preparedStatement.setInt(1, fId);
+            preparedStatement.setString(2, filterName);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
                 String username = rs.getString("username");
@@ -84,12 +105,14 @@ public class UserDao {
 
     public void addUser(String username, String pass) throws SQLException {
         PreparedStatement preparedStatement = connection.
-                prepareStatement("insert into Users values (?, ?)");
+                prepareStatement("insert into Users values (?, ?, ?)");
         preparedStatement.setString(1, username);
         preparedStatement.setString(2, pass);
+        preparedStatement.setInt(3, 0);
         preparedStatement.execute();
     }
-    public void deleteUser(String username) throws SQLException{
+
+    public void deleteUser(String username) throws SQLException {
         PreparedStatement preparedStatement = connection.
                 prepareStatement("delete from Permit where username=?");
         preparedStatement.setString(1, username);
@@ -103,11 +126,12 @@ public class UserDao {
         preparedStatement.setString(1, username);
         preparedStatement.execute();
     }
-    public List<User> getAllUsers() throws SQLException{
+
+    public List<User> getAllUsers() throws SQLException {
         PreparedStatement ps = connection.prepareStatement("select * from Users");
         ResultSet rs = ps.executeQuery();
         List<User> users = new ArrayList<>();
-        while(rs.next()){
+        while (rs.next()) {
             User user = new User();
             user.setUsername(rs.getString(1));
             user.setPassword(rs.getString(2));
@@ -115,5 +139,18 @@ public class UserDao {
             users.add(user);
         }
         return users;
+    }
+    
+    public void updateQuota(String username, int quota) {
+        try {
+            PreparedStatement preparedStatement = connection.
+                    prepareStatement("update [users] set quota = ? "
+                            + "where username = ?");
+            preparedStatement.setInt(1, quota);
+            preparedStatement.setString(2, username);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

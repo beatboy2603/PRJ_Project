@@ -7,11 +7,13 @@ package controllers;
 
 import dao.FileDao;
 import dao.PermitDao;
+import dao.UserDao;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import static java.lang.Math.toIntExact;
 import static java.lang.Thread.sleep;
 import java.nio.file.Paths;
 import java.util.List;
@@ -42,8 +44,8 @@ public class FileController extends HttpServlet {
         try {
             HttpSession session = request.getSession();
             String usernameInSession = (String) session.getAttribute("username");
-            if(usernameInSession.equals(getServletContext().getInitParameter("admin"))){
-                usernameInSession=request.getParameter("username");
+            if (usernameInSession.equals(getServletContext().getInitParameter("admin"))) {
+                usernameInSession = request.getParameter("username");
             }
             FileDao dao = new FileDao();
             List<File> files;
@@ -77,23 +79,31 @@ public class FileController extends HttpServlet {
                 RequestDispatcher view = request.getRequestDispatcher("addFile.jsp");
                 view.forward(request, response);
             } else {
-                InputStream fileContent = filePart.getInputStream();
-                byte[] buffer = new byte[fileContent.available()];
-                fileContent.read(buffer);
-                java.io.File targetFile = new java.io.File(getServletContext().getInitParameter("Storage") + username + "\\" + fileName);
-                OutputStream outStream = new FileOutputStream(targetFile);
-                outStream.write(buffer);
-                String fName = fileName;
-                String fSize = "" + filePart.getSize();
-                String fOwner = username;
-                String privacy = request.getParameter("privacy") == null ? "private" : "public";
-                (new FileDao()).addFile(fName, fSize, fOwner, privacy);
-                File addedFile = (new FileDao()).getFile(fOwner, fName);
-                (new PermitDao()).addPermit(addedFile.getfId(), addedFile.getfOwner());
-                fileContent.close();
-                outStream.close();
-                //sleep de kip copy file vao
-                sleep(2000);
+                int fSize = toIntExact(filePart.getSize());
+                int newQuota = (new UserDao()).getUser(username).getQuota() + fSize;
+                if (newQuota > (1 * 1024 * 1024 * 1024)) {
+                    request.setAttribute("error", "Out of quota!");
+                    RequestDispatcher view = request.getRequestDispatcher("addFile.jsp");
+                    view.forward(request, response);
+                } else {
+                    InputStream fileContent = filePart.getInputStream();
+                    byte[] buffer = new byte[fileContent.available()];
+                    fileContent.read(buffer);
+                    java.io.File targetFile = new java.io.File(getServletContext().getInitParameter("Storage") + username + "\\" + fileName);
+                    OutputStream outStream = new FileOutputStream(targetFile);
+                    outStream.write(buffer);
+                    String fName = fileName;
+                    String fOwner = username;
+                    String privacy = request.getParameter("privacy") == null ? "private" : "public";
+                    (new FileDao()).addFile(fName, fSize, fOwner, privacy);
+                    File addedFile = (new FileDao()).getFile(fOwner, fName);
+                    (new PermitDao()).addPermit(addedFile.getfId(), addedFile.getfOwner());
+                    (new UserDao()).updateQuota(username, newQuota);
+                    fileContent.close();
+                    outStream.close();
+                    //sleep de kip copy file vao
+                    sleep(2000);
+                }
             }
             response.sendRedirect("./File");
         } catch (Exception ex) {

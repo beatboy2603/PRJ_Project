@@ -25,23 +25,32 @@ import models.File;
  *
  * @author ADMIN
  */
-@WebServlet(name = "Share", urlPatterns = {"/Share"})
-public class ShareController extends HttpServlet {
+@WebServlet(name = "Privacy", urlPatterns = {"/Privacy"})
+public class PrivacyController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             String fId = request.getParameter("fId");
+            String filterName = request.getParameter("filterName");
+            String subFilterName = filterName;
+            if (filterName == null) {
+                filterName = "";
+            } else if (filterName.trim().equals("")) {
+                filterName = "%";
+            } else {
+                filterName = "%" + filterName + "%";
+            }
             File file = (new FileDao()).getFile(Integer.parseInt(fId));
-            List<String> usernames = (new UserDao()).getShareableUsers(Integer.parseInt(fId));
+            List<String> usernames = (new UserDao()).getShareableUsers(Integer.parseInt(fId), filterName);
+            request.setAttribute("subFilterName", subFilterName);
             request.setAttribute("usernames", usernames);
             request.setAttribute("file", file);
-            
-            RequestDispatcher view = request.getRequestDispatcher("share.jsp");
+            RequestDispatcher view = request.getRequestDispatcher("privacy.jsp");
             view.forward(request, response);
         } catch (Exception ex) {
-            Logger.getLogger(ShareController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PrivacyController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -49,12 +58,21 @@ public class ShareController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            String action = request.getParameter("action");
             String fId = request.getParameter("fId");
-            String userToShare = request.getParameter("userToShare");
-            (new PermitDao()).addPermit(Integer.parseInt(fId), userToShare);
+            switch (action) {
+                case "Share":
+                    String userToShare = request.getParameter("userToShare");
+                    System.out.println(userToShare);
+                    (new PermitDao()).addPermit(Integer.parseInt(fId), userToShare);
+                    break;
+                case "Switch":
+                    (new FileDao()).updatePrivacy(Integer.parseInt(fId));
+                    break;
+            }
             response.sendRedirect("./File");
         } catch (Exception ex) {
-            Logger.getLogger(ShareController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PrivacyController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

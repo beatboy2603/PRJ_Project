@@ -12,7 +12,7 @@ package models;
 public class File {
     private int fId;
     private String fName;
-    private String fSize;
+    private int fSize;
     private String fOwner;
     private String privacy;
 
@@ -24,7 +24,7 @@ public class File {
         return fName;
     }
 
-    public String getfSize() {
+    public int getfSize() {
         return fSize;
     }
 
@@ -44,7 +44,7 @@ public class File {
         this.fName = fName;
     }
 
-    public void setfSize(String fSize) {
+    public void setfSize(int fSize) {
         this.fSize = fSize;
     }
 
@@ -56,7 +56,7 @@ public class File {
         this.privacy = privacy;
     }
 
-    public File(int fId, String fName, String fSize, String fOwner, String privacy) {
+    public File(int fId, String fName, int fSize, String fOwner, String privacy) {
         this.fId = fId;
         this.fName = fName;
         this.fSize = fSize;

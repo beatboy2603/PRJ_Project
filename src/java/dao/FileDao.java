@@ -39,7 +39,7 @@ public class FileDao {
                 File file = new File();
                 file.setfId(rs.getInt("fId"));
                 file.setfName(rs.getString("fName"));
-                file.setfSize(rs.getString("fSize"));
+                file.setfSize(rs.getInt("fSize"));
                 file.setfOwner(rs.getString("fOwner"));
                 file.setPrivacy(rs.getString("Privacy"));
                 files.add(file);
@@ -65,7 +65,7 @@ public class FileDao {
                 File file = new File();
                 file.setfId(rs.getInt("fId"));
                 file.setfName(rs.getString("fName"));
-                file.setfSize(rs.getString("fSize"));
+                file.setfSize(rs.getInt("fSize"));
                 file.setfOwner(rs.getString("fOwner"));
                 file.setPrivacy(rs.getString("Privacy"));
                 files.add(file);
@@ -104,7 +104,7 @@ public class FileDao {
             while (rs.next()) {
                 file.setfId(rs.getInt("fId"));
                 file.setfName(rs.getString("fName"));
-                file.setfSize(rs.getString("fSize"));
+                file.setfSize(rs.getInt("fSize"));
                 file.setfOwner(rs.getString("fOwner"));
                 file.setPrivacy(rs.getString("Privacy"));
                 return file;
@@ -125,7 +125,7 @@ public class FileDao {
             while (rs.next()) {
                 file.setfId(rs.getInt("fId"));
                 file.setfName(rs.getString("fName"));
-                file.setfSize(rs.getString("fSize"));
+                file.setfSize(rs.getInt("fSize"));
                 file.setfOwner(rs.getString("fOwner"));
                 file.setPrivacy(rs.getString("Privacy"));
                 return file;
@@ -136,22 +136,22 @@ public class FileDao {
         return null;
     }
 
-    public void updateFile(int fId, String fName, String fSize, String fOwner, String privacy) throws SQLException {
+    public void updateFile(int fId, String fName, int fSize, String fOwner, String privacy) throws SQLException {
         PreparedStatement preparedStatement = connection.
                 prepareStatement("update files set fName = ?, fSize = ?, fOwner = ?, privacy = ? where fId = ?");
         preparedStatement.setString(1, fName);
-        preparedStatement.setString(2, fSize);
+        preparedStatement.setInt(2, fSize);
         preparedStatement.setString(3, fOwner);
         preparedStatement.setString(4, privacy);
         preparedStatement.setInt(5, fId);
         preparedStatement.execute();
     }
 
-    public void addFile(String fName, String fSize, String fOwner, String privacy) throws SQLException {
+    public void addFile(String fName, int fSize, String fOwner, String privacy) throws SQLException {
         PreparedStatement preparedStatement = connection.
                 prepareStatement("insert into files (fName, fSize, fOwner, Privacy) values (?, ?, ?, ?)");
         preparedStatement.setString(1, fName);
-        preparedStatement.setString(2, fSize);
+        preparedStatement.setInt(2, fSize);
         preparedStatement.setString(3, fOwner);
         preparedStatement.setString(4, privacy);
         preparedStatement.execute();
@@ -161,6 +161,16 @@ public class FileDao {
         PreparedStatement preparedStatement = connection.
                 prepareStatement("delete from files where fid = ?");
         preparedStatement.setInt(1, fId);
+        preparedStatement.execute();
+    }
+
+    public void updatePrivacy(int fId) throws SQLException {
+        File file = getFile(fId);
+        String newPrivacy = file.getPrivacy().equals("public")?"private":"public";
+        PreparedStatement preparedStatement = connection.
+                prepareStatement("update files set privacy = ? where fid = ?");
+        preparedStatement.setString(1, newPrivacy);
+        preparedStatement.setInt(2, fId);
         preparedStatement.execute();
     }
 }

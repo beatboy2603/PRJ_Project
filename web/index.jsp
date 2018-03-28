@@ -22,20 +22,34 @@
                 <img src="iconReplacement/cloudIcon.png" style="height:50px; width:50px"/>
             </div>
             <div id="userDiv">
-                ${sessionScope.username}
+                <c:choose>
+                    <c:when test="${admin!=null}">
+                        ${param.username}'s
+                    </c:when>
+                    <c:otherwise>
+                        ${sessionScope.username}
+                    </c:otherwise>
+                </c:choose>
             </div>
             <div id="controlDiv">
-                <form class="controlDivElement" action = "./addFile.jsp" method = "POST">
-                    <input type="submit" name ="action" value="Add"/>
-                </form>
-                <form class="controlDivElement" action = "./File" method = "Get">
-                    <input type="hidden" name="fileType" value="myFiles"/>
-                    <input type="submit" value="My Files"/>
-                </form>
-                <form class="controlDivElement" action = "./File" method = "Get">
-                    <input type="hidden" name="fileType" value="sharedFiles"/>
-                    <input type="submit" value="Shared To Me"/>
-                </form>
+                <c:choose>
+                    <c:when test="${admin!=null}">
+                        <a href="./User" style="text-decoration:none"><input class="controlDivElement" type="button" value="Back"/></a>
+                        </c:when>
+                        <c:otherwise>
+                        <form class="controlDivElement" action = "./addFile.jsp" method = "GET">
+                            <input type="submit" name ="action" value="Add"/>
+                        </form>
+                        <form class="controlDivElement" action = "./File" method = "Get">
+                            <input type="hidden" name="fileType" value="myFiles"/>
+                            <input type="submit" value="My Files"/>
+                        </form>
+                        <form class="controlDivElement" action = "./File" method = "Get">
+                            <input type="hidden" name="fileType" value="sharedFiles"/>
+                            <input type="submit" value="Shared To Me"/>
+                        </form>
+                    </c:otherwise>
+                </c:choose>
                 <form class="controlDivElement" action = "./Logout" method = "Get">
                     <input type="submit" name ="Logout" value="Logout"/>
                 </form>
@@ -64,18 +78,32 @@
                     <p>${current.fName}</p>
                     <div class="fileButtonDiv">
                         <form class ="fileButton" action="./Download" method="GET">
+                            <c:if test="${admin!=null}">
+                                <input type="hidden" name="username" value="${param.username}"/>   
+                            </c:if>
                             <input type="hidden" name="fId" value="${current.fId}"/>   
                             <input type="submit" value="Download"/>
                         </form>
-                        <form class ="fileButton" action="./Share" method="GET">
-                            <input type="hidden" name="fId" value="${current.fId}" />
-                            <input type="submit" value="Share"/>
-                        </form>
-                        <form class ="fileButton deleteButton">
-                            <input type="hidden" class="fileId" name="fId" value="${current.fId}" />
-                            <input type="hidden" class="fileName" name="fName" value="${current.fName}" />
-                            <input type="button" value="Delete"/>
-                        </form>
+                        <c:choose>
+                            <c:when test="${admin!=null||username!=current.fOwner}">
+                            </c:when>
+                            <c:otherwise>
+                                <form class ="fileButton" action="./Privacy" method="GET">
+                                    <input type="hidden" name="fId" value="${current.fId}" />
+                                    <input type="submit" value="Privacy"/>
+                                </form>
+                            </c:otherwise>
+                        </c:choose>
+                        <c:if test="${username==current.fOwner||admin!=null}">
+                            <form class ="fileButton deleteButton">
+                                <c:if test="${admin!=null}">
+                                    <input type="hidden" name="username" value="${param.username}"/>   
+                                </c:if>
+                                <input type="hidden" class="fileId" name="fId" value="${current.fId}" />
+                                <input type="hidden" class="fileName" name="fName" value="${current.fName}" />
+                                <input type="button" value="Delete"/>
+                            </form>
+                        </c:if>
                     </div>
                 </div>
                 <c:if test = "${count % 4 == 0}">

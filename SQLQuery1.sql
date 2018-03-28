@@ -5,7 +5,7 @@ create table Users(
 create table Files(
 	fId int not null identity(1,1) primary key,
 	fName nvarchar(100) not null,
-	fSize nvarchar(30) not null,
+	fSize int not null,
 	fOwner nvarchar(20) not null foreign key references Users(username),
 	Privacy nvarchar(20)
 );

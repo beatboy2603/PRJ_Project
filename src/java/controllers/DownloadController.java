@@ -35,12 +35,15 @@ public class DownloadController extends HttpServlet {
         try {
             String fId = request.getParameter("fId");
             File file = (new FileDao()).getFile(Integer.parseInt(fId));
-            if (file.getPrivacy().equalsIgnoreCase("private")) {
-                HttpSession session = request.getSession();
-                String username = (String) session.getAttribute("username");
-                if(!(new PermitDao()).checkPermit(Integer.parseInt(fId), username)){
-                    response.sendRedirect("./File");
-                    return;
+            HttpSession session = request.getSession();
+            String admin = (String) session.getAttribute("admin");
+            if (admin == null) {
+                if (file.getPrivacy().equalsIgnoreCase("private")) {
+                    String username = (String) session.getAttribute("username");
+                    if (!(new PermitDao()).checkPermit(Integer.parseInt(fId), username)) {
+                        response.sendRedirect("./File");
+                        return;
+                    }
                 }
             }
             String IP = request.getRemoteAddr();
@@ -49,7 +52,7 @@ public class DownloadController extends HttpServlet {
             Base64 encrypt = new Base64(IP, Integer.parseInt(fId), timestamp);
             String link = encrypt.getEncoded();
             request.setAttribute("link", link);
-            request.setAttribute("fName", file.getfName());
+            request.setAttribute("file", file);
             RequestDispatcher view = request.getRequestDispatcher("download.jsp");
             view.forward(request, response);
 

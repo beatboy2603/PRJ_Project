@@ -7,6 +7,7 @@ package controllers;
 
 import dao.FileDao;
 import dao.PermitDao;
+import dao.UserDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -19,6 +20,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import models.File;
 
 /**
@@ -27,27 +29,39 @@ import models.File;
  */
 @WebServlet(name = "Delete", urlPatterns = {"/Delete"})
 public class DeleteController extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             String fId = request.getParameter("fId");
             File file = (new FileDao()).getFile(Integer.parseInt(fId));
+            int fSize = file.getfSize();
+            String fOwner = file.getfOwner();
+            int newQuota = (new UserDao()).getUser(fOwner).getQuota() - fSize;
             (new PermitDao()).deleteAllPermit(Integer.parseInt(fId));
             (new FileDao()).deleteFile(Integer.parseInt(fId));
+            (new UserDao()).updateQuota(fOwner, newQuota);
             Path path = Paths.get(getServletContext().getInitParameter("Storage") + file.getfOwner() + "\\" + file.getfName());
             Files.delete(path);
-            response.sendRedirect("./File");
+            HttpSession session = request.getSession();
+            String admin = (String) session.getAttribute("admin");
+            if (admin == null) {
+                response.sendRedirect("./File");
+            }else{
+                String username = (String) session.getAttribute("username");
+                response.sendRedirect("./File?username="+username);
+            }
+            
         } catch (Exception ex) {
             Logger.getLogger(DeleteController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
     }
 
     /**

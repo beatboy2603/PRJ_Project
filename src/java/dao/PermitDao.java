@@ -50,7 +50,7 @@ public class PermitDao {
                     prepareStatement("insert into permit values(?,?)");
             preparedStatement.setInt(1, fId);
             preparedStatement.setString(2, username);
-            preparedStatement.executeQuery();
+            preparedStatement.execute();
         } catch (SQLException ex) {
             Logger.getLogger(PermitDao.class.getName()).log(Level.SEVERE, null, ex);
         }
