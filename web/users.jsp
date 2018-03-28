@@ -78,6 +78,12 @@
                         <td><a href="./File?username=${one.username}">${one.username}</a></td>
                         <td><fmt:formatNumber type = "number" 
                                           maxFractionDigits = "3" value = "${one.quota/1024/1024}"/> MB</td>
+                        <td>
+                            <form action="" method="POST">
+                                <input type="hidden" name="username" value="${one.username}"/>
+                                <input type="submit" value="Delete"/>
+                            </form>
+                        </td>
                     </tr>
                 </c:forEach>
             </tbody>

@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import models.File;
 import models.User;
 
 /**
@@ -125,6 +126,13 @@ public class UserDao {
                 prepareStatement("delete from [Users] where username=?");
         preparedStatement.setString(1, username);
         preparedStatement.execute();
+        java.io.File index = new java.io.File("D:\\Documents\\NetBeansProjects\\PRJ_Project\\web\\fileManager\\"+username);
+        String[] entries = index.list();
+        for (String s : entries) {
+            java.io.File currentFile = new java.io.File(index.getPath(), s);
+            currentFile.delete();
+        }
+        index.delete();
     }
 
     public List<User> getAllUsers() throws SQLException {
@@ -140,7 +148,7 @@ public class UserDao {
         }
         return users;
     }
-    
+
     public void updateQuota(String username, int quota) {
         try {
             PreparedStatement preparedStatement = connection.
