@@ -73,7 +73,7 @@ public class FileDownloadManager extends HttpServlet {
         String fileName = file.getName();
 
         if (!file.exists()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         long length = file.length();
