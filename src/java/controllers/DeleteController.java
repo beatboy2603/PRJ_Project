@@ -9,7 +9,6 @@ import dao.FileDao;
 import dao.PermitDao;
 import dao.UserDao;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,7 +49,7 @@ public class DeleteController extends HttpServlet {
                 response.sendRedirect("./File");
             }else{
                 String username = (String) session.getAttribute("username");
-                response.sendRedirect("./File?username="+username);
+                response.sendRedirect("./File?username="+fOwner);
             }
             
         } catch (Exception ex) {
