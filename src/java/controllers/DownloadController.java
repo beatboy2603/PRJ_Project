@@ -38,6 +38,10 @@ public class DownloadController extends HttpServlet {
             HttpSession session = request.getSession();
             String admin = (String) session.getAttribute("admin");
             if (admin == null) {
+                if(file==null){
+                    response.sendRedirect("./File");
+                    return;
+                }
                 if (file.getPrivacy().equalsIgnoreCase("private")) {
                     String username = (String) session.getAttribute("username");
                     if (!(new PermitDao()).checkPermit(Integer.parseInt(fId), username)) {
