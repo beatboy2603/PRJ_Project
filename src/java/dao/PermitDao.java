@@ -62,7 +62,7 @@ public class PermitDao {
             PreparedStatement preparedStatement = connection.
                     prepareStatement("delete from permit where id = ?");
             preparedStatement.setInt(1, fId);
-            preparedStatement.executeQuery();
+            preparedStatement.execute();
         } catch (SQLException ex) {
             Logger.getLogger(PermitDao.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -74,7 +74,7 @@ public class PermitDao {
                     prepareStatement("delete from permit where id = ? and username = ?");
             preparedStatement.setInt(1, fId);
             preparedStatement.setString(2, username);
-            preparedStatement.executeQuery();
+            preparedStatement.execute();
         } catch (SQLException ex) {
             Logger.getLogger(PermitDao.class.getName()).log(Level.SEVERE, null, ex);
         }
