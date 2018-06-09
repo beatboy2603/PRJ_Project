@@ -97,7 +97,7 @@
                         <c:if test="${username==current.fOwner||admin!=null}">
                             <form class ="fileButton deleteButton">
                                 <c:if test="${admin!=null}">
-                                    <input type="hidden" name="username" value="${param.username}"/>   
+                                    <input type="hidden" name="fileOwner" value="${param.username}"/>   
                                 </c:if>
                                 <input type="hidden" class="fileId" name="fId" value="${current.fId}" />
                                 <input type="hidden" class="fileName" name="fName" value="${current.fName}" />
