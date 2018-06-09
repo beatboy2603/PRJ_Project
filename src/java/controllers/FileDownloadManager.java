@@ -137,7 +137,6 @@ public class FileDownloadManager extends HttpServlet {
             /*Do nothing since it is most likely user disconnected from download*/
         } finally {
             try {
-
                 input.close();
                 output.close();
             } catch (IOException e) {
