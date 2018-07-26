@@ -122,7 +122,7 @@ public class UserDao {
         preparedStatement.setString(1, username);
         preparedStatement.execute();
         preparedStatement = connection.
-                prepareStatement("delete from User where username=?");
+                prepareStatement("delete from [Users] where username=?");
         preparedStatement.setString(1, username);
         preparedStatement.execute();
     }
