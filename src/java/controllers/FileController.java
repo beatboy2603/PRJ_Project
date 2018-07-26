@@ -44,8 +44,9 @@ public class FileController extends HttpServlet {
         try {
             HttpSession session = request.getSession();
             String usernameInSession = (String) session.getAttribute("username");
-            if (usernameInSession.equals(getServletContext().getInitParameter("admin"))) {
-                usernameInSession = request.getParameter("username");
+            if(usernameInSession.equals(getServletContext().getInitParameter("admin"))){
+                usernameInSession=request.getParameter("username");
+                if(usernameInSession==null)response.sendRedirect("./User");
             }
             FileDao dao = new FileDao();
             List<File> files;

@@ -69,7 +69,8 @@ public class Login extends HttpServlet {
                     view.forward(request, response);
                 }
             } else {
-                response.sendRedirect("./File");
+                if(session.getAttribute("admin")==null)response.sendRedirect("./File");
+                else response.sendRedirect("./User");
             }
         } catch (Exception ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);

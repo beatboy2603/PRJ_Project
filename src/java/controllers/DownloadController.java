@@ -35,15 +35,13 @@ public class DownloadController extends HttpServlet {
         try {
             String fId = request.getParameter("fId");
             File file = (new FileDao()).getFile(Integer.parseInt(fId));
-            HttpSession session = request.getSession();
-            String admin = (String) session.getAttribute("admin");
-            if (admin == null) {
-                if (file.getPrivacy().equalsIgnoreCase("private")) {
-                    String username = (String) session.getAttribute("username");
-                    if (!(new PermitDao()).checkPermit(Integer.parseInt(fId), username)) {
-                        response.sendRedirect("./File");
-                        return;
-                    }
+            if (file.getPrivacy().equalsIgnoreCase("private")) {
+                HttpSession session = request.getSession();
+                String username = (String) session.getAttribute("username");
+                if(session.getAttribute("admin")!=null){}
+                else if(!(new PermitDao()).checkPermit(Integer.parseInt(fId), username)){
+                    response.sendRedirect("./File");
+                    return;
                 }
             }
             String IP = request.getRemoteAddr();

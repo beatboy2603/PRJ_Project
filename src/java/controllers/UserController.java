@@ -83,7 +83,15 @@ public class UserController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            String username = request.getParameter("username");
+            dao.UserDao dao = new UserDao();
+            dao.deleteUser(username);
+            response.sendRedirect("./User");
+        } catch (Exception ex) {
+            Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
     }
 
     /**
